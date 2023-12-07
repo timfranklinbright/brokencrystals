@@ -1,0 +1,52 @@
+name: gh-simple
+
+on: workflow_dispatch
+#on:
+#  push:
+#    branches:
+#      - crawler
+#      - har-file
+#      - swagger
+#      - brokencrystals
+#  pull_request:
+#    branches: [main]
+#  schedule:
+#    - cron: "0 0 * * THU"
+
+jobs:
+  start_and_wait_scan:
+    runs-on: ubuntu-20.04
+    container: node:16
+    name: A job to run a BrightSec scan
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          apt update -qq --fix-missing
+          apt install -y --no-install-recommends nodejs npm make g++
+          npm install -g @brightsec/cli --unsafe-perm=true
+          apt-get install jq -y 
+          apt-get install curl -y
+      - name: Save environment variables
+        run: |
+          printf "BRIGHT_TOKEN1=${{ secrets.BRIGHT_TOKEN1 }}\nPROJECT5=${{ secrets.BRIGHT_PROJECT1 }}\nBC_LESSB_AUTH5=${{ secrets.BRIGHT_AUTH1 }}" > .env
+          cat .env
+      - run: sleep 3s
+      - name: Start Brightsec Scan 🏁
+        id: start
+        run: |
+          SCAN_ID=$(bright-cli scan:run --token ${{ secrets.BRIGHT_TOKEN1 }} --name "💎 BrokenCrystals for a '${GITHUB_REF##*/}' branch #${GITHUB_RUN_NUMBER}" --test csrf dom_xss header_security secret_tokens open_buckets excessive_data_exposure --crawler https://brokencrystals.brightsec.net/  --auth ${{ secrets.BRIGHT_AUTH1 }}  --project ${{ secrets.BRIGHT_PROJECT1 }}  --cluster demo.brightsec.com)  
+          echo "SCAN_ID=$SCAN_ID" >> $GITHUB_ENV
+      - name: Get the output scan url 🔗
+        run: |
+          printf "Scan was started, check the details at https://demo.brightsec.com/scans/$SCAN_ID"
+      - name: Wait for issues ⏳
+        run: |
+          echo "POLLING_RESULT=Stop" >> $GITHUB_ENV
+          POLLING_RESULT=$(bright-cli scan:polling  --interval 30s   --timeout 101m --token ${{ secrets.BRIGHT_TOKEN1 }} --breakpoint critical_issue $SCAN_ID  --cluster demo.brightsec.com)
+          echo "POLLING_RESULT=$POLLING_RESULT" >> $GITHUB_ENV
+      - name: Stop Scan 🛑
+        continue-on-error: true
+        if: ${{ failure() }}
+        run: |
+          printf "Polling result was $POLLING_RESULT"
+          bright-cli scan:stop --token ${{ secrets.BRIGHT_TOKEN1 }} $SCAN_ID --cluster demo.brightsec.com
