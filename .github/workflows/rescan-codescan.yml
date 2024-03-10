@@ -1,4 +1,4 @@
-name: CI
+name: rescan-codescan
 
 on: workflow_dispatch
 #on:
