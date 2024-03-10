@@ -1,17 +1,18 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - crawler
-      - har-file
-      - swagger
-      - brokencrystals
-      - codescan
-  pull_request:
-    branches: [codescan]
-  schedule:
-    - cron: "0 0 * * THU"
+on: workflow_dispatch
+#on:
+#  push:
+#    branches:
+#      - crawler
+#      - har-file
+#      - swagger
+#      - brokencrystals
+#      - codescan
+#  pull_request:
+#    branches: [codescan]
+#  schedule:
+#    - cron: "0 0 * * THU"
 
 jobs:
   wait_for:
@@ -23,15 +24,15 @@ jobs:
         id: start
         uses: NeuraLegion/run-scan@release
         with:
-          api_token: ${{ secrets.BRIGHT_TOKEN}}
+          api_token: ${{ secrets.BRIGHT_TOKEN1}}
           hostname: app.brightsec.com
           name: Bright Scan - ${{ github.sha }}
-          restart_scan: ${{ secrets.BRIGHT_SCAN_ID}}
+          restart_scan: ${{ secrets.BRIGHT_SCANID1}}
       - name: Wait for breakpoint
         id: wait
         uses: NeuraLegion/wait-for@release
         with:
-          api_token:  ${{ secrets.BRIGHT_TOKEN }}
+          api_token:  ${{ secrets.BRIGHT_TOKEN1 }}
           hostname: app.brightsec.com
           scan: ${{ steps.start.outputs.id }}
           wait_for: high
@@ -43,5 +44,5 @@ jobs:
         id: stop
         uses: NeuraLegion/stop-scan@release
         with:
-          api_token: ${{ secrets.BRIGHT_TOKEN }}
+          api_token: ${{ secrets.BRIGHT_TOKEN1 }}
           scan: ${{ steps.start.outputs.id }}
