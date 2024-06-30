@@ -22,34 +22,34 @@ jobs:
         id: start
         uses: NeuraLegion/run-scan@release
         with:
-          api_token: ${{ secrets.BRIGHT_TOKEN}}
+          api_token: ${{ secrets.BRIGHT_TOKEN1}}
           hostname: app.brightsec.com
           name: Bright Scan - ${{ github.sha }}
-          restart_scan: ${{ secrets.BRIGHT_SCANID}}
+          restart_scan: ${{ secrets.BRIGHT_SCANID1}}
       - name: Wait for breakpoint
         id: wait
         uses: NeuraLegion/wait-for@release
         with:
-          api_token:  ${{ secrets.BRIGHT_TOKEN }}
+          api_token:  ${{ secrets.BRIGHT_TOKEN1 }}
           hostname: app.brightsec.com
           scan: ${{ steps.start.outputs.id }}
           wait_for: high
-#          code_scanning_alerts: true
-#          github_token: ${{ secrets.KEY_GITHUB }}
+          code_scanning_alerts: true
+          github_token: ${{ secrets.KEY_GITHUB }}
           timeout: 600
       - name: 🛑 Stop the scan
         if: ${{ always() }}
         id: stop
         uses: NeuraLegion/stop-scan@release
         with:
-          api_token: ${{ secrets.BRIGHT_TOKEN }}
+          api_token: ${{ secrets.BRIGHT_TOKEN1 }}
           scan: ${{ steps.start.outputs.id }}
       - name: Download SARIF file
         id: sarif
         env:
-          api_token: ${{ secrets.BRIGHT_TOKEN }}
+          api_token: ${{ secrets.BRIGHT_TOKEN1 }}
           scan: ${{ steps.start.outputs.id }}
-          scanId: ${{ secrets.BRIGHT_SCANID}}
+          scanId: ${{ secrets.BRIGHT_SCANID1}}
           hostname: app.brightsec.com
       run: |
         echo Downloading sarif report
