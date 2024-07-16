@@ -42,8 +42,8 @@ jobs:
           scanId: ${{ secrets.BRIGHT_SCANID}}
           hostname: app.brightsec.com
       - run: |
-           echo Downloading sarif report
-           curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key ${{ parameters.apiToken }}" -o $(sarifFilePath).gz
-           gzip -d $(sarifFilePath).gz
-           sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
-           echo "sarif file text: $sarifFileText"        
+          echo Downloading sarif report
+          curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key ${{ parameters.apiToken }}" -o $(sarifFilePath).gz
+          gzip -d $(sarifFilePath).gz
+          sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
+          echo "sarif file text: $sarifFileText"        
