@@ -1,3 +1,5 @@
+name: rescan codescan sariff
+
 on: workflow_dispatch
 #on:
 #  push:
