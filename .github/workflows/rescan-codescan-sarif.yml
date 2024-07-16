@@ -39,7 +39,7 @@ jobs:
           scan: ${{ steps.start.outputs.id }}
           scanId: ${{ secrets.BRIGHT_SCANID}}
           hostname: app.brightsec.com
-      - run: |
+        run: |
           echo Downloading sarif report
           curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key ${{ parameters.apiToken }}" -o $(sarifFilePath).gz
           gzip -d $(sarifFilePath).gz
