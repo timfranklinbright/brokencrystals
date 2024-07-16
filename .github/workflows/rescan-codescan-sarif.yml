@@ -1,18 +1,6 @@
-name: rescan codescan sariff
+name: rescan-codescan-sariff
 
 on: workflow_dispatch
-#on:
-#  push:
-#    branches:
-#      - crawler
-#      - har-file
-#      - swagger
-#      - brokencrystals
-#      - codescan
-#  pull_request:
-#    branches: [codescan]
-#  schedule:
-#    - cron: "0 0 * * THU"
 
 jobs:
   wait_for:
@@ -53,9 +41,9 @@ jobs:
           scan: ${{ steps.start.outputs.id }}
           scanId: ${{ secrets.BRIGHT_SCANID}}
           hostname: app.brightsec.com
-      run: |
-        echo Downloading sarif report
-        curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key ${{ parameters.apiToken }}" -o $(sarifFilePath).gz
-        gzip -d $(sarifFilePath).gz
-        sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
-        echo "sarif file text: $sarifFileText"        
+      - run: |
+           echo Downloading sarif report
+           curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key ${{ parameters.apiToken }}" -o $(sarifFilePath).gz
+           gzip -d $(sarifFilePath).gz
+           sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
+           echo "sarif file text: $sarifFileText"        
