@@ -15,7 +15,7 @@ jobs:
           api_token: ${{ secrets.BRIGHT_TOKEN}}
           hostname: app.brightsec.com
           name: Bright Scan - ${{ github.sha }}
-          restart_scan: ${{ BRIGHT_SCANIDMULT}}
+          restart_scan: ${{ secrets.BRIGHT_SCANIDMULT}}
       - name: Wait for breakpoint
         id: wait
         uses: NeuraLegion/wait-for@release
@@ -26,12 +26,14 @@ jobs:
           wait_for: high
           code_scanning_alerts: true
           github_token: ${{ secrets.KEY_GITHUB }}
-          timeout: 600
+          interval: 1800
+          timeout: 1830
       - name: Download SARIF file
         id: sarif
         env:
           api_token: ${{ secrets.BRIGHT_TOKEN }}
-          scanId: ${{ steps.start.outputs.id }}
+          scan: ${{ steps.start.outputs.id }}
+          scanId: ${{ secrets.BRIGHT_SCANIDMULT}}
           hostname: app.brightsec.com
         run: |
           echo Downloading sarif report
