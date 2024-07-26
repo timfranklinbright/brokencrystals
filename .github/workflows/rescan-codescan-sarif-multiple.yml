@@ -26,25 +26,17 @@ jobs:
           wait_for: high
           code_scanning_alerts: true
           github_token: ${{ secrets.KEY_GITHUB }}
-          interval: 1800
-          timeout: 1830
+          interval: 600
+          timeout: 600
       - name: Download SARIF file
         id: sarif
         env:
           api_token: ${{ secrets.BRIGHT_TOKEN }}
-          scan: ${{ steps.start.outputs.id }}
-          scanId: ${{ secrets.BRIGHT_SCANIDMULT}}
+          scanId: ${{ steps.start.outputs.id }}
           hostname: app.brightsec.com
         run: |
           echo Downloading sarif report
           curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key $(api_token)" -o $(sarifFilePath).gz
           gzip -d $(sarifFilePath).gz
           sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
-          echo "sarif file text: $sarifFileText"    
-      - name: 🛑 Stop the scan
-        if: ${{ always() }}
-        id: stop
-        uses: NeuraLegion/stop-scan@release
-        with:
-          api_token: ${{ secrets.BRIGHT_TOKEN }}
-          scan: ${{ steps.start.outputs.id }}    
+          echo "sarif file text: $sarifFileText"      
