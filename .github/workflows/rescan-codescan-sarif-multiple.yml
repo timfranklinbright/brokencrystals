@@ -1,0 +1,48 @@
+name: rescan-codescan-sarif
+
+on: workflow_dispatch
+
+jobs:
+  wait_for:
+    name: Wait for any issues, gh-int + code_scanning_alerts on
+    runs-on: ubuntu-latest
+    container: node:16
+    steps:
+      - name: Scan Start
+        id: start
+        uses: NeuraLegion/run-scan@release
+        with:
+          api_token: ${{ secrets.BRIGHT_TOKEN}}
+          hostname: app.brightsec.com
+          name: Bright Scan - ${{ github.sha }}
+          restart_scan: ${{ BRIGHT_SCANIDMULT}}
+      - name: Wait for breakpoint
+        id: wait
+        uses: NeuraLegion/wait-for@release
+        with:
+          api_token:  ${{ secrets.BRIGHT_TOKEN }}
+          hostname: app.brightsec.com
+          scan: ${{ steps.start.outputs.id }}
+          wait_for: high
+          code_scanning_alerts: true
+          github_token: ${{ secrets.KEY_GITHUB }}
+          timeout: 1800
+      - name: Download SARIF file
+        id: sarif
+        env:
+          api_token: ${{ secrets.BRIGHT_TOKEN }}
+          scanId: ${{ steps.start.outputs.id }}
+          hostname: app.brightsec.com
+        run: |
+          echo Downloading sarif report
+          curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key $(api_token)" -o $(sarifFilePath).gz
+          gzip -d $(sarifFilePath).gz
+          sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
+          echo "sarif file text: $sarifFileText"    
+      - name: 🛑 Stop the scan
+        if: ${{ always() }}
+        id: stop
+        uses: NeuraLegion/stop-scan@release
+        with:
+          api_token: ${{ secrets.BRIGHT_TOKEN }}
+          scan: ${{ steps.start.outputs.id }}    
