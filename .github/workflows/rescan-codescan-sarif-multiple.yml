@@ -31,11 +31,11 @@ jobs:
         id: sarif
         env:
           api_token: ${{ secrets.BRIGHT_TOKEN }}
-          scanId: ${{ steps.start.outputs.id }}
+          scan: ${{ steps.start.outputs.id }}
           hostname: app.brightsec.com
         run: |
           echo Downloading sarif report
-          curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key $(api_token)" -o $(sarifFilePath).gz
+          curl -X GET "$(hostname)/api/v1/scans/$(scan)/reports/sarif" -H "Authorization: Api-Key $(api_token)" -o $(sarifFilePath).gz
           gzip -d $(sarifFilePath).gz
           sarifFileText=$(cat NeuraLegion_ScanReport.sarif)
-          echo "sarif file text: $sarifFileText"      
+          echo "sarif file text: $sarifFileText"  
