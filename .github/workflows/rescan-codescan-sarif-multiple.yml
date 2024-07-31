@@ -35,7 +35,7 @@ jobs:
           hostname: https://app.brightsec.com
         run: |
           echo Downloading sarif report
-          curl -X GET "$(hostname)/api/v1/scans/$(scanId)/reports/sarif" -H "Authorization: Api-Key $(api_token)" -o sarifFilePath.gz
+          curl -X GET "$(hostname)/api/v1/scans/$scanId/reports/sarif" -H "Authorization: Api-Key $api_token" -o sarifFilePath.gz
           gzip -d sarifFilePath.gz
           sarifFileText=$(cat sarifFilePath)
           echo "sarif file text: $sarifFileText"  
