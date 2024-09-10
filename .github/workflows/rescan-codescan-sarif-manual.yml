@@ -49,5 +49,5 @@ jobs:
       - name: Save SARIF file
         uses: actions/upload-artifact@v4
         with: 
-          name: my-artifact
+          name: BrightSecurity_sarif_report
           path: bright.sarif    
